@@ -38,8 +38,8 @@ hooks:
 
 ## Installation
 
-This extension is not (yet) in the official Spec Kit community catalog, so
-install it directly from a release archive:
+Internal extension — install directly from a release archive on our internal
+Git host (no official Spec Kit catalog listing):
 
 ```bash
 specify extension add de-speckit-extension \
@@ -67,9 +67,5 @@ specify extension enable de-speckit-extension
 
 1. Bump `version` in `extension.yml` (semver) and add a `CHANGELOG.md` entry.
 2. Tag and push: `git tag vX.Y.Z && git push --tags`.
-3. Create a GitHub Release for that tag — `specify extension add ... --from <url>`
+3. Create a release for that tag — `specify extension add ... --from <url>`
    points at the release archive's zip URL.
-4. Optional: submit to the official community catalog via a GitHub Issue on
-   [github/spec-kit](https://github.com/github/spec-kit) using their
-   "Extension Submission" template (do not open a PR against
-   `extensions/catalog.community.json` directly).
