@@ -1,0 +1,48 @@
+# de-speckit-extension configuration
+# Copied to .specify/extensions/de-speckit-extension/de-speckit-extension-config.yml on install
+
+# Global toggle for the whole extension.
+enabled: true
+
+# Per-event enable/disable, mirroring the `git` extension's auto_commit pattern.
+# "default" applies to any event without its own entry below.
+hooks:
+  default: false
+
+  before_constitution:
+    enabled: false
+  before_specify:
+    enabled: false
+  before_clarify:
+    enabled: false
+  before_plan:
+    enabled: false
+  before_tasks:
+    enabled: false
+  before_implement:
+    enabled: false
+  before_checklist:
+    enabled: false
+  before_analyze:
+    enabled: false
+  before_taskstoissues:
+    enabled: false
+
+  after_constitution:
+    enabled: false
+  after_specify:
+    enabled: false
+  after_clarify:
+    enabled: false
+  after_plan:
+    enabled: false
+  after_tasks:
+    enabled: false
+  after_implement:
+    enabled: false
+  after_checklist:
+    enabled: false
+  after_analyze:
+    enabled: false
+  after_taskstoissues:
+    enabled: false
