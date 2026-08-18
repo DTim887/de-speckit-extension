@@ -3,7 +3,7 @@ schema_version: "1.0"
 extension:
   id: de-speckit-extension
   name: "DE Speckit Extension"
-  version: "0.1.0"
+  version: "0.2.0"
   description: "DE's organization-wide Spec Kit extension"
   author: "Tim Jin"
   license: MIT
