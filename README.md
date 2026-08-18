@@ -1,40 +1,31 @@
 # de-speckit-extension
 
-<!-- TODO: one paragraph describing what this extension does and why. -->
+DE's organization-wide Spec Kit extension. It exists so DE-specific
+conventions and governance checks can run automatically alongside the
+standard spec-kit workflow, without every team having to redefine them
+per project.
 
-A [Spec Kit](https://github.com/github/spec-kit) extension that hooks into
-every core SDD lifecycle event (`before_*`/`after_*` for `constitution`,
-`specify`, `clarify`, `plan`, `tasks`, `implement`, `checklist`, `analyze`,
-`taskstoissues`). Every hook is **optional and individually configurable**,
-following the same pattern as the bundled `git` extension.
+A [Spec Kit](https://github.com/github/spec-kit) extension. Currently it
+provides one command, `speckit.de-speckit-extension.read-jira-ticket`,
+which also runs as a mandatory `before_specify` gate.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `speckit.de-speckit-extension.hook` | TODO: describe |
+| `speckit.de-speckit-extension.read-jira-ticket` | Fetch a JIRA ticket's description (`SHDRP-<number>`) as plain text; also gates `/speckit.specify` on a valid ticket reference |
 
 ## Hooks
 
-All lifecycle events currently point at the single `speckit.de-speckit-extension.hook`
-command (see `extension.yml`), which branches on the event name it receives.
-Split any event out into its own command + `provides.commands` entry if it
-needs different logic.
+`before_specify` is wired to `speckit.de-speckit-extension.read-jira-ticket`
+with `optional: false` (see `extension.yml`) — every `/speckit.specify` run
+must carry a leading `SHDRP-<number>` ticket key, or it's blocked. See the
+command file for the full behavior.
 
 ## Configuration
 
-Configuration lives in `.specify/extensions/de-speckit-extension/de-speckit-extension-config.yml`
-after install (copied from `config-template.yml`):
-
-```yaml
-enabled: true
-
-hooks:
-  default: false
-  after_specify:
-    enabled: true
-  # ... one entry per before_*/after_* event, see config-template.yml
-```
+No configurable options yet. `config-template.yml` is a stub reserved for
+future commands added to this extension; nothing currently reads it.
 
 ## Installation
 
@@ -43,7 +34,7 @@ Git host (no official Spec Kit catalog listing):
 
 ```bash
 specify extension add de-speckit-extension \
-  --from https://github.com/TODO/de-speckit-extension/archive/refs/tags/v0.1.0.zip
+  --from https://github.com/DTim887/de-speckit-extension/archive/refs/tags/v0.1.0.zip
 ```
 
 For local development against a checkout of this repo:
@@ -61,7 +52,11 @@ specify extension enable de-speckit-extension
 
 ## Graceful Degradation
 
-<!-- TODO -->
+None — intentionally. `speckit.de-speckit-extension.read-jira-ticket` is a
+mandatory gate: a missing/malformed ticket key, missing credentials, or any
+Jira API failure blocks `/speckit.specify` with a clear error rather than
+skipping silently. See the command file's Graceful Degradation section for
+details.
 
 ## Publishing a new version
 

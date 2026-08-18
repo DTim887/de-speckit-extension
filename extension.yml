@@ -4,11 +4,11 @@ extension:
   id: de-speckit-extension
   name: "DE Speckit Extension"
   version: "0.1.0"
-  description: "TODO: one-sentence description of what this extension does (<=100 chars)"
-  author: "TODO: your name"
+  description: "DE's organization-wide Spec Kit extension"
+  author: "Tim Jin"
   license: MIT
-  repository: "https://github.com/TODO/de-speckit-extension"
-  homepage: "https://github.com/TODO/de-speckit-extension"
+  repository: "https://github.com/DTim887/de-speckit-extension"
+  homepage: "https://github.com/DTim887/de-speckit-extension"
 
 requires:
   speckit_version: ">=0.2.0"
@@ -16,9 +16,9 @@ requires:
 
 provides:
   commands:
-    - name: speckit.de-speckit-extension.hook
-      file: commands/speckit.de-speckit-extension.hook.md
-      description: "TODO: describe what this hook command does when triggered"
+    - name: speckit.de-speckit-extension.read-jira-ticket
+      file: commands/speckit.de-speckit-extension.read-jira-ticket.md
+      description: "Fetch a JIRA ticket's description (SHDRP-<number>) as plain text; also gates /speckit.specify on a valid ticket reference"
 
   config:
     - name: "de-speckit-extension-config.yml"
@@ -26,107 +26,14 @@ provides:
       description: "Per-project configuration for this extension's hooks"
       required: false
 
-# One event -> one command mapping per lifecycle phase. All events below
-# currently point at the same shared command (commands/speckit.de-speckit-extension.hook.md),
-# which is expected to branch on the event name it receives — mirrors how the
-# bundled `git` extension reuses `speckit.git.commit` across most hooks.
-# Split any of these out to their own command file + provides.commands entry
-# if a given phase needs different logic.
 hooks:
-  before_constitution:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before constitution setup?"
-    description: "TODO"
   before_specify:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before specification?"
-    description: "TODO"
-  before_clarify:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before clarification?"
-    description: "TODO"
-  before_plan:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before planning?"
-    description: "TODO"
-  before_tasks:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before task generation?"
-    description: "TODO"
-  before_implement:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before implementation?"
-    description: "TODO"
-  before_checklist:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before checklist generation?"
-    description: "TODO"
-  before_analyze:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before analysis?"
-    description: "TODO"
-  before_taskstoissues:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension before tasks-to-issues sync?"
-    description: "TODO"
-  after_constitution:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after constitution update?"
-    description: "TODO"
-  after_specify:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after specification?"
-    description: "TODO"
-  after_clarify:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after clarification?"
-    description: "TODO"
-  after_plan:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after planning?"
-    description: "TODO"
-  after_tasks:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after task generation?"
-    description: "TODO"
-  after_implement:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after implementation?"
-    description: "TODO"
-  after_checklist:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after checklist generation?"
-    description: "TODO"
-  after_analyze:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after analysis?"
-    description: "TODO"
-  after_taskstoissues:
-    command: speckit.de-speckit-extension.hook
-    optional: true
-    prompt: "Run de-speckit-extension after tasks-to-issues sync?"
-    description: "TODO"
+    command: speckit.de-speckit-extension.read-jira-ticket
+    optional: false
+    description: "Mandatory gate: require a valid SHDRP-<number> JIRA ticket reference and inject its description before /speckit.specify runs"
 
 tags:
   - "custom"
 
-config:
-  defaults:
-    enabled: true
+defaults:
+  enabled: true
