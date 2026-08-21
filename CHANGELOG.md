@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Added `speckit.de-speckit-extension.figma-implement-design`: translates a
+  Figma design into production-ready code with 1:1 visual fidelity via the
+  Figma MCP server.
+
 ## [0.2.0] - 2026-08-19
 
 ### Changed

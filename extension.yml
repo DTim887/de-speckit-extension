@@ -20,6 +20,10 @@ provides:
       file: commands/speckit.de-speckit-extension.read-jira-ticket.md
       description: "Fetch a JIRA ticket's description (SHDRP-<number>) as plain text; also gates /speckit.specify on a valid ticket reference"
 
+    - name: speckit.de-speckit-extension.figma-implement-design
+      file: commands/speckit.de-speckit-extension.figma-implement-design.md
+      description: "Translate a Figma design into production-ready code with 1:1 visual fidelity, via the Figma MCP server"
+
   config:
     - name: "de-speckit-extension-config.yml"
       template: "config-template.yml"

@@ -5,15 +5,14 @@ conventions and governance checks can run automatically alongside the
 standard spec-kit workflow, without every team having to redefine them
 per project.
 
-A [Spec Kit](https://github.com/github/spec-kit) extension. Currently it
-provides one command, `speckit.de-speckit-extension.read-jira-ticket`,
-which also runs as a mandatory `before_specify` gate.
+A [Spec Kit](https://github.com/github/spec-kit) extension.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
 | `speckit.de-speckit-extension.read-jira-ticket` | Fetch a JIRA ticket's description (`SHDRP-<number>`) as plain text; also gates `/speckit.specify` on a valid ticket reference |
+| `speckit.de-speckit-extension.figma-implement-design` | Translate a Figma design into production-ready code with 1:1 visual fidelity, via the Figma MCP server |
 
 ## Hooks
 

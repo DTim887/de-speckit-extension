@@ -1,17 +1,24 @@
 ---
-name: figma-implement-design
 description: Translates Figma designs into production-ready application code with 1:1 visual fidelity. Use when implementing UI code from Figma files, when user mentions "implement design", "generate code", "implement component", provides Figma URLs, or asks to build components matching Figma specs.
+tools:
+  - 'figma/get_design_context'
+  - 'figma/get_screenshot'
+  - 'figma/get_metadata'
 ---
 
 # Implement Design
 
+## User Input
+
+$ARGUMENTS
+
 ## Overview
 
-This skill provides a structured workflow for translating Figma designs into production-ready code with pixel-perfect accuracy. It ensures consistent integration with the Figma MCP server, proper use of design tokens, and 1:1 visual parity with designs.
+This command provides a structured workflow for translating Figma designs into production-ready code with pixel-perfect accuracy. It ensures consistent integration with the Figma MCP server, proper use of design tokens, and 1:1 visual parity with designs.
 
-## Skill Boundaries
+## Command Boundaries
 
-- Use this skill when the deliverable is code in the user's repository.
+- Use this command when the deliverable is code in the user's repository.
 
 ## Prerequisites
 
