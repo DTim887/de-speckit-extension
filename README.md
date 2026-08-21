@@ -33,7 +33,7 @@ Git host (no official Spec Kit catalog listing):
 
 ```bash
 specify extension add de-speckit-extension \
-  --from https://github.com/DTim887/de-speckit-extension/archive/refs/tags/v0.2.0.zip
+  --from https://github.com/DTim887/de-speckit-extension/archive/refs/tags/v0.3.0.zip
 ```
 
 For local development against a checkout of this repo:
