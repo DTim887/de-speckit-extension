@@ -2,29 +2,137 @@
 # Fetches a Jira issue's `description` field and prints it as plain text
 # (paragraph breaks preserved, no Markdown formatting, tables/lists not
 # specially rendered — just flattened block by block).
-# Invoked as: read-jira-ticket.sh <TICKET-KEY>
+#
+# Usage:
+#   read-jira-ticket.sh <TICKET-KEY>                 # manual mode
+#   read-jira-ticket.sh <event_name> [<TICKET-KEY>]  # hook mode
+#
+# Manual mode: $1 is a ticket key (e.g. SHDRP-437322). Validates, fetches,
+# prints. Any failure is a non-zero exit with a message on stderr.
+#
+# Hook mode: $1 is a before_*/after_* event name; $2 is an optional ticket
+# key the caller already found by searching the gated command's
+# natural-language input. Reads jira_gate.<event_name>.enabled (falling
+# back to jira_gate.default) from
+# .specify/extensions/de-speckit-extension/de-speckit-extension-config.yml,
+# mirroring the official git extension's auto_commit.<event>.enabled
+# pattern (plain grep/sed line scanning, no yq/jq dependency for YAML):
+#   enabled=false            -> gate inactive for this event: exit 0, no
+#                                output, no processing at all (even if a
+#                                ticket key was passed).
+#   enabled=true, no ticket  -> exit 1 (block): a ticket reference is
+#                                required here and none was found.
+#   enabled=true, has ticket -> validate + fetch as in manual mode; any
+#                                failure is still a non-zero exit.
 #
 # Requires ATLASSIAN_EMAIL and ATLASSIAN_API_TOKEN in the environment.
 # ATLASSIAN_BASE_URL may override the default DE Jira Cloud instance.
-#
-# Exits non-zero (with a message on stderr) on any failure: bad ticket key
-# format, missing credentials, missing tools, network/auth/HTTP errors, or a
-# ticket with no description. There is no "degrade gracefully" path here —
-# this script backs a mandatory before_specify gate, so any failure must be
-# visible and must stop the caller from proceeding.
 set -euo pipefail
 
-TICKET_KEY="${1:-}"
-BASE_URL="${ATLASSIAN_BASE_URL:-https://disneyexperiences.atlassian.net}"
 TICKET_PATTERN='^SHDRP-[0-9]+$'
+EVENT_PATTERN='^(before|after)_[a-z]+$'
+BASE_URL="${ATLASSIAN_BASE_URL:-https://disneyexperiences.atlassian.net}"
 
 err() {
   echo "[read-jira-ticket] $1" >&2
 }
 
-if [[ -z "$TICKET_KEY" ]]; then
-  err "Missing required argument: a JIRA ticket key (e.g. SHDRP-437322)."
-  err "Usage: read-jira-ticket.sh <TICKET-KEY>"
+ARG1="${1:-}"
+ARG2="${2:-}"
+TICKET_KEY=""
+
+if [[ -z "$ARG1" ]]; then
+  err "Usage: read-jira-ticket.sh <TICKET-KEY> | read-jira-ticket.sh <event_name> [<TICKET-KEY>]"
+  exit 1
+fi
+
+if [[ "$ARG1" =~ $TICKET_PATTERN ]]; then
+  # Manual mode.
+  TICKET_KEY="$ARG1"
+elif [[ "$ARG1" =~ $EVENT_PATTERN ]]; then
+  # Hook mode.
+  EVENT_NAME="$ARG1"
+  TICKET_KEY="$ARG2"
+
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  _find_project_root() {
+    local dir="$1"
+    while [[ "$dir" != "/" ]]; do
+      if [[ -d "$dir/.specify" || -d "$dir/.git" ]]; then
+        echo "$dir"
+        return 0
+      fi
+      dir="$(dirname "$dir")"
+    done
+    return 1
+  }
+  REPO_ROOT="$(_find_project_root "$SCRIPT_DIR")" || REPO_ROOT="$(pwd)"
+  CONFIG_FILE="$REPO_ROOT/.specify/extensions/de-speckit-extension/de-speckit-extension-config.yml"
+
+  # If the config file (or the jira_gate section, or this event's entry)
+  # is missing, default to enforcing the gate — unlike e.g. the git
+  # extension's auto-commit, this extension exists to make JIRA references
+  # mandatory, so "no config yet" must not silently disable it.
+  enabled=true
+  default_enabled=true
+
+  if [[ -f "$CONFIG_FILE" ]]; then
+    in_section=false
+    in_event=false
+    event_found=false
+
+    while IFS= read -r line; do
+      if echo "$line" | grep -q '^jira_gate:'; then
+        in_section=true
+        in_event=false
+        continue
+      fi
+      if $in_section && echo "$line" | grep -Eq '^[a-z]'; then
+        break
+      fi
+      if $in_section; then
+        if echo "$line" | grep -Eq '^[[:space:]]+default:[[:space:]]'; then
+          val=$(echo "$line" | sed 's/^[^:]*:[[:space:]]*//' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          [[ "$val" == "false" ]] && default_enabled=false
+          [[ "$val" == "true" ]] && default_enabled=true
+        fi
+        if echo "$line" | grep -Eq "^[[:space:]]+${EVENT_NAME}:"; then
+          in_event=true
+          event_found=true
+          continue
+        fi
+        if $in_event; then
+          if echo "$line" | grep -Eq '^[[:space:]]{2}[a-z]' && ! echo "$line" | grep -Eq '^[[:space:]]{4}'; then
+            in_event=false
+            continue
+          fi
+          if echo "$line" | grep -Eq '[[:space:]]+enabled:'; then
+            val=$(echo "$line" | sed 's/^[^:]*:[[:space:]]*//' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+            [[ "$val" == "false" ]] && enabled=false
+            [[ "$val" == "true" ]] && enabled=true
+          fi
+        fi
+      fi
+    done < "$CONFIG_FILE"
+
+    if ! $event_found; then
+      enabled=$default_enabled
+    fi
+  fi
+
+  if [[ "$enabled" != "true" ]]; then
+    # Gate inactive for this event: complete no-op, regardless of whether
+    # a ticket key was passed.
+    exit 0
+  fi
+
+  if [[ -z "$TICKET_KEY" ]]; then
+    err "JIRA gate is enabled for '$EVENT_NAME' but no SHDRP-<digits> ticket reference was found in the relevant input."
+    exit 1
+  fi
+else
+  err "Invalid first argument '$ARG1' — expected a ticket key (SHDRP-<digits>) or an event name (before_x / after_x)."
   exit 1
 fi
 

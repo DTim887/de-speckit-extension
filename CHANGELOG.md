@@ -2,6 +2,30 @@
 
 本项目所有值得关注的变更都会记录在这个文件里。
 
+## [未发布]
+
+### 变更
+
+- `speckit.de-speckit-extension.read-jira-ticket` 挂载的全部 18 个
+  生命周期事件，`optional` 从 `false` 改回默认值 `true`：核心引擎每次
+  触发都会先给用户一条 prompt（"读取 JIRA 门禁检查 `<phase>` 生成
+  前/后"），问要不要运行这个检查，用户同意后才会真正调用；命令是否
+  真正生效由 `jira_gate.<event>.enabled` 决定。
+- 修正 `jira_gate.<event>.enabled` 的语义，对齐官方 `git` 扩展
+  `auto_commit.<event>.enabled` 的实际用法：`enabled: false` 现在是
+  **完全不生效**（哪怕输入里恰好有合法 ticket key 也不处理），不再是
+  之前那个"没开但找到了也会用"的尽力而为中间态。
+- "读 config、判断是否阻断"这套逻辑从命令文件的 Steps 搬进了
+  `scripts/bash/read-jira-ticket.sh` 本身：脚本新增
+  `read-jira-ticket.sh <event_name> [<ticket_key>]` 这个 hook 模式，
+  用纯 `grep`/`sed` 按行解析 YAML（不引入 `yq`/`jq` 依赖，跟
+  `auto-commit.sh` 的做法一致），命令文件里不用再重复这套判断。
+- 命令文件正文大幅精简（143 行 → 72 行，参考
+  `speckit.git.commit.md` 的写法）：去掉写死的"事件 → 核心命令 →
+  token"推导表格和 before/after 分别展开的说明，统一成"确定事件名 →
+  在相关输入里找 ticket → 调脚本 → 按退出码/输出决定阻断、放行还是
+  把结果交给下一步"。
+
 ## [0.4.0] - 2026-08-24
 
 ### 变更

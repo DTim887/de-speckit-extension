@@ -10,7 +10,7 @@ DE 的组织级 Spec Kit 扩展。它的存在是为了让 DE 特有的约定和
 
 | 命令 | 说明 |
 |------|------|
-| `speckit.de-speckit-extension.read-jira-ticket` | 通用 JIRA 门槛：从被挂载的核心命令的自然语言输入里找出 `SHDRP-<number>` 引用，拉取其 description 作为上下文；可挂载在 spec-kit 任意 `before_*`/`after_*` 生命周期事件上 |
+| `speckit.de-speckit-extension.read-jira-ticket` | 读取一个 JIRA ticket（`SHDRP-<number>`）的 description，交给下一步作为输入；可挂载在 spec-kit 任意 `before_*`/`after_*` 生命周期事件上 |
 | `speckit.de-speckit-extension.figma-implement-design` | 通过 Figma MCP 服务器，把 Figma 设计稿转换成与设计 1:1 还原的可用代码 |
 
 ## Hooks
@@ -18,28 +18,28 @@ DE 的组织级 Spec Kit 扩展。它的存在是为了让 DE 特有的约定和
 `speckit.de-speckit-extension.read-jira-ticket` 是一个**通用命令**，挂在
 全部 18 个核心生命周期事件上（9 个阶段 × `before_`/`after_`：
 constitution、specify、clarify、plan、tasks、implement、checklist、
-analyze、taskstoissues），全部 `optional: false`（见
-`extension.yml`）——核心引擎始终会尝试触发它。它不依赖写死的事件列表，
-`extension.yml` 挂载哪些事件都不需要改这个命令文件本身。
+analyze、taskstoissues）。每个事件都是 `optional: true`（默认，见
+`extension.yml`）——核心引擎每次触发都会先给用户一条 prompt，问要不要
+运行这个 JIRA 检查，用户同意后 agent 才会调用。
 
-- `before_X`：在核心命令 `X` 执行前拦截，把 ticket description 注入其
-  输入。
-- `after_X`：`X` 已经执行完了，改为把 ticket description 交付给
-  后续步骤（同事件的下一个 hook，或用户接下来要跑的下一个生命周期
-  命令）作为上下文。
+这个命令一旦被调用，是否真正生效由项目的
+`de-speckit-extension-config.yml` 里 `jira_gate.<event>.enabled` 决定：
 
-每个事件是否**强制**要求一个合法的 `SHDRP-<number>` 引用（找不到时
-`before_X` 阻断 `X` 本身、`after_X` 阻断"下一步"），由
-`de-speckit-extension-config.yml` 里 `jira_gate.<event>.enabled` 单独
-控制；一旦输入里出现了 ticket 引用，无论开关状态如何，它都必须真实
-有效。完整行为见对应命令文件。
+- `enabled: true`：门禁生效——在相关输入里找 `SHDRP-<number>`，找到
+  就拉取 description 交给下一步，找不到就阻断。
+- `enabled: false`：门禁完全不生效，直接放行，即使输入里恰好有合法
+  ticket key 也不处理。
+
+一旦按 `enabled: true` 找到了 ticket，它本身校验失败（不存在、认证
+失败、description 为空等）就一律硬阻断，不再看这个开关。完整行为见
+对应命令文件。
 
 ## 配置
 
-`config-template.yml` 里的 `jira_gate` 控制上述 18 个事件各自是否强制
-要求 JIRA ticket，默认全部为 `true`（强制）。项目可以按需在
+`config-template.yml` 里的 `jira_gate` 控制上述 18 个事件各自是否生效，
+默认全部为 `true`。项目可以按需在
 `.specify/extensions/de-speckit-extension/de-speckit-extension-config.yml`
-里把某个事件改成 `false`，让它变成"有 ticket 就用，没有也放行"。
+里把某个事件改成 `false`，让门禁在该事件上完全不生效。
 
 ## 安装
 
@@ -66,10 +66,14 @@ specify extension enable de-speckit-extension
 
 ## 优雅降级
 
-分两种情况：输入里完全没有 ticket 引用时，是否阻断由
-`jira_gate.<event>.enabled` 决定；但只要输入里出现了格式合法的 ticket
-key，它的校验/拉取失败（不存在、认证失败、网络错误、description 为空
-等）就没有优雅降级，一律硬阻断。详见对应命令文件里的"优雅降级"章节。
+- `jira_gate.<event>.enabled` 为 `false`：门禁在该事件上完全不生效——
+  不去找 ticket，也不会校验，哪怕输入里恰好有合法 ticket key 也不
+  处理。这是唯一存在优雅降级的地方。
+- `enabled` 为 `true` 时（只有这个分支才会真的去找、去校验 ticket）：
+  找不到就阻断；找到了但校验/拉取失败（不存在、认证失败、网络错误、
+  description 为空等）就没有优雅降级，一律硬阻断——这条不会跟
+  `enabled: false` 的情况同时发生。详见对应命令文件里的"优雅降级"
+  章节。
 
 ## 发布新版本
 

@@ -18,7 +18,7 @@ provides:
   commands:
     - name: speckit.de-speckit-extension.read-jira-ticket
       file: commands/speckit.de-speckit-extension.read-jira-ticket.md
-      description: "通用 JIRA 门槛：从被挂载的核心命令的自然语言输入里找出 SHDRP-<number> 引用，拉取其 description 作为上下文；可挂载在任意 before_*/after_* 生命周期事件上"
+      description: "读取一个 JIRA ticket（SHDRP-<number>）的 description，交给下一步作为输入；可挂载在 spec-kit 任意 before_*/after_* 生命周期事件上"
 
     - name: speckit.de-speckit-extension.figma-implement-design
       file: commands/speckit.de-speckit-extension.figma-implement-design.md
@@ -31,90 +31,104 @@ provides:
       required: false
 
 # 全部 18 个生命周期事件（9 个核心阶段各自的 before_*/after_*）都共用
-# 同一个 speckit.de-speckit-extension.read-jira-ticket 命令，每个事件都
-# 是 optional: false —— 核心引擎始终尝试触发它，不做"要不要执行"的交互式
-# 询问。每个事件是否真正强制要求 ticket（找不到时要不要阻断）由项目自己的
+# 同一个 speckit.de-speckit-extension.read-jira-ticket 命令。每个事件都是
+# optional: true（默认）——核心引擎每次触发都会先给用户一条 prompt，问要不要
+# 执行这个 JIRA 检查，用户同意后 agent 才会调用；是否真正生效（找不到 ticket
+# 要不要阻断）则由项目自己的
 # .specify/extensions/de-speckit-extension/de-speckit-extension-config.yml
-# 里 jira_gate.<event>.enabled 单独控制，见 config-template.yml。
-#
-# before_X：在核心命令 X 执行前拦截，把 ticket description 注入其输入。
-# after_X：X 已经执行完，改为把 ticket description 交付给后续步骤
-# （同事件的下一个 hook，或用户接下来要跑的下一个生命周期命令）作为
-# 上下文；找不到 ticket 且 enabled 为 true 时，阻断的是"下一步"，不是
-# 已经跑完的 X 本身。命令文件里详细说明了这套逻辑。
+# 里 jira_gate.<event>.enabled 单独控制，见 config-template.yml。命令文件里
+# 详细说明了具体行为。
 hooks:
   before_constitution:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 constitution 生成前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 constitution 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_constitution:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 constitution 生成后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 constitution 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_specify:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 specification 生成前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 specify 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_specify:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 specification 生成后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 specify 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_clarify:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 spec 澄清前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 clarify 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_clarify:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 spec 澄清后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 clarify 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_plan:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 implementation planning 前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 plan 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_plan:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 implementation planning 后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 plan 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_tasks:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 task generation 前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 tasks 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_tasks:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 task generation 后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 tasks 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_implement:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 implementation 前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 implement 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_implement:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 implementation 后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 implement 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_checklist:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 checklist 生成前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 checklist 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_checklist:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 checklist 生成后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 checklist 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_analyze:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 cross-artifact analysis 前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 analyze 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_analyze:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 cross-artifact analysis 后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 analyze 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_taskstoissues:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 tasks-to-issues 转换前，从触发命令的输入里找 SHDRP-<number> 并注入其 description"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 taskstoissues 生成前"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_taskstoissues:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: false
-    description: "JIRA 门槛：在 tasks-to-issues 转换后，从刚执行的命令输入里找 SHDRP-<number>，拉取 description 交付给后续步骤"
+    optional: true
+    prompt: "读取 JIRA 门禁检查 taskstoissues 生成后"
+    description: "JIRA 门禁：读取 ticket 并交给下一步"
 
 tags:
   - "custom"
