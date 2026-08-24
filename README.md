@@ -32,7 +32,7 @@ Spec Kit catalog 上架）：
 
 ```bash
 specify extension add de-speckit-extension \
-  --from https://github.com/DTim887/de-speckit-extension/archive/refs/tags/v0.3.0.zip
+  --from https://github.com/DTim887/de-speckit-extension/archive/refs/tags/v0.3.1.zip
 ```
 
 针对本仓库的本地检出做本地开发：
