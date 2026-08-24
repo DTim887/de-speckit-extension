@@ -4,7 +4,7 @@ extension:
   id: de-speckit-extension
   name: "DE Speckit Extension"
   version: "0.3.0"
-  description: "DE's organization-wide Spec Kit extension"
+  description: "DE 的组织级 Spec Kit 扩展"
   author: "Tim Jin"
   license: MIT
   repository: "https://github.com/DTim887/de-speckit-extension"
@@ -18,23 +18,23 @@ provides:
   commands:
     - name: speckit.de-speckit-extension.read-jira-ticket
       file: commands/speckit.de-speckit-extension.read-jira-ticket.md
-      description: "Fetch a JIRA ticket's description (SHDRP-<number>) as plain text; also gates /speckit.specify on a valid ticket reference"
+      description: "拉取 JIRA ticket（SHDRP-<number>）的 description 作为纯文本；同时把 /speckit.specify 挂在一个合法 ticket 引用上作为门槛"
 
     - name: speckit.de-speckit-extension.figma-implement-design
       file: commands/speckit.de-speckit-extension.figma-implement-design.md
-      description: "Translate a Figma design into production-ready code with 1:1 visual fidelity, via the Figma MCP server"
+      description: "通过 Figma MCP 服务器，把 Figma 设计稿转换成与设计 1:1 还原的可用代码"
 
   config:
     - name: "de-speckit-extension-config.yml"
       template: "config-template.yml"
-      description: "Per-project configuration for this extension's hooks"
+      description: "这个扩展各 hook 的项目级配置"
       required: false
 
 hooks:
   before_specify:
     command: speckit.de-speckit-extension.read-jira-ticket
     optional: false
-    description: "Mandatory gate: require a valid SHDRP-<number> JIRA ticket reference and inject its description before /speckit.specify runs"
+    description: "强制门槛：要求一个合法的 SHDRP-<number> JIRA ticket 引用，并在 /speckit.specify 运行前注入其 description"
 
 tags:
   - "custom"

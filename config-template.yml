@@ -1,7 +1,6 @@
-# de-speckit-extension configuration
-# Copied to .specify/extensions/de-speckit-extension/de-speckit-extension-config.yml on install
+# de-speckit-extension 配置
+# 安装时会被复制为 .specify/extensions/de-speckit-extension/de-speckit-extension-config.yml
 #
-# No configurable options yet — speckit.de-speckit-extension.read-jira-ticket
-# is a mandatory, always-on gate on before_specify (see extension.yml) and
-# has nothing to toggle here. Add per-command settings below as new
-# commands are added to this extension.
+# 目前没有可配置项 —— speckit.de-speckit-extension.read-jira-ticket
+# 是挂在 before_specify 上的强制门槛（始终启用，见 extension.yml），
+# 没有开关可切。以后给这个扩展新增命令时，把对应的配置项加在这里。

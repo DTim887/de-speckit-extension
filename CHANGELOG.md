@@ -1,32 +1,31 @@
-# Changelog
+# 变更日志
 
-All notable changes to this project will be documented in this file.
+本项目所有值得关注的变更都会记录在这个文件里。
 
 ## [0.3.0] - 2026-08-21
 
-### Added
+### 新增
 
-- Added `speckit.de-speckit-extension.figma-implement-design`: translates a
-  Figma design into production-ready code with 1:1 visual fidelity via the
-  Figma MCP server.
+- 新增 `speckit.de-speckit-extension.figma-implement-design`：通过 Figma
+  MCP 服务器，把 Figma 设计稿转换成与设计 1:1 还原的可用代码。
 
 ## [0.2.0] - 2026-08-19
 
-### Changed
+### 变更
 
-- Removed the generic `speckit.de-speckit-extension.hook` scaffold command
-  (and its bash/PowerShell scripts), which was wired into every
-  `before_*`/`after_*` lifecycle event.
-- Added `speckit.de-speckit-extension.read-jira-ticket`: fetches a JIRA
-  ticket's description (`SHDRP-<number>`, from the org's Jira Cloud
-  instance) and gates `/speckit.specify` on a valid ticket reference —
-  mandatory (`optional: false`), with no graceful degradation on failure.
-- Simplified `config-template.yml` to a stub; there are no configurable
-  options now that the per-event enable/disable scaffold is gone.
+- 移除了通用的 `speckit.de-speckit-extension.hook` 脚手架命令（及其
+  bash/PowerShell 脚本），原本它挂在所有 `before_*`/`after_*` 生命周期
+  事件上。
+- 新增 `speckit.de-speckit-extension.read-jira-ticket`：拉取 JIRA
+  ticket（`SHDRP-<number>`，来自公司的 Jira Cloud 实例）的 description，
+  并把 `/speckit.specify` 挂在一个合法 ticket 引用上作为门槛 ——
+  强制执行（`optional: false`），失败时不做优雅降级。
+- 把 `config-template.yml` 简化成一个 stub；随着按事件启用/禁用的旧
+  脚手架被移除，现在已经没有可配置项了。
 
 ## [0.1.0] - 2026-08-16
 
-### Added
+### 新增
 
-- Initial extension scaffold: `extension.yml`, config template, and a shared
-  hook command wired into every `before_*`/`after_*` lifecycle event.
+- 初始扩展脚手架：`extension.yml`、配置模板，以及挂在所有
+  `before_*`/`after_*` 生命周期事件上的共享 hook 命令。
