@@ -1,6 +1,59 @@
 # de-speckit-extension 配置
 # 安装时会被复制为 .specify/extensions/de-speckit-extension/de-speckit-extension-config.yml
+
+# JIRA 门槛（speckit.de-speckit-extension.read-jira-ticket）在各生命周期
+# 事件上的行为。"default" 适用于下面没有单独列出的事件。
 #
-# 目前没有可配置项 —— speckit.de-speckit-extension.read-jira-ticket
-# 是挂在 before_specify 上的强制门槛（始终启用，见 extension.yml），
-# 没有开关可切。以后给这个扩展新增命令时，把对应的配置项加在这里。
+# enabled: true  —— 强制：
+#   before_X 时，如果被拦截的核心命令 X 的输入里找不到 SHDRP-<number>
+#   格式的 ticket 引用，就阻断 X 本身执行；
+#   after_X 时，X 已经执行完，如果它当初的输入里找不到 ticket 引用，
+#   就阻断"下一步"（同事件的下一个 hook，或用户接下来要跑的下一个
+#   生命周期命令），而不是回滚 X。
+# enabled: false —— 尽力而为：
+#   如果输入里恰好带了合法的 ticket 引用，仍然会拉取并把 description
+#   作为上下文（before_X 注入给 X 本身；after_X 交付给后续步骤）；
+#   但找不到 ticket 时不阻断任何东西，流程照常继续。
+#
+# 注意：无论某个事件的 enabled 是 true 还是 false，只要输入里出现了一个
+# 格式合法的 SHDRP-<number>，这个 ticket 本身校验失败（不存在、认证失败、
+# description 为空等）都会硬阻断 —— 这个不受下面任何开关控制。
+jira_gate:
+  default: true
+
+  before_constitution:
+    enabled: true
+  after_constitution:
+    enabled: true
+  before_specify:
+    enabled: true
+  after_specify:
+    enabled: true
+  before_clarify:
+    enabled: true
+  after_clarify:
+    enabled: true
+  before_plan:
+    enabled: true
+  after_plan:
+    enabled: true
+  before_tasks:
+    enabled: true
+  after_tasks:
+    enabled: true
+  before_implement:
+    enabled: true
+  after_implement:
+    enabled: true
+  before_checklist:
+    enabled: true
+  after_checklist:
+    enabled: true
+  before_analyze:
+    enabled: true
+  after_analyze:
+    enabled: true
+  before_taskstoissues:
+    enabled: true
+  after_taskstoissues:
+    enabled: true
