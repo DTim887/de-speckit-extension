@@ -2,6 +2,28 @@
 
 本项目所有值得关注的变更都会记录在这个文件里。
 
+## [未发布]
+
+### 新增
+
+- 新增 `speckit.de-speckit-extension.generate-manual-tests`：分析当前
+  feature 已完成的实现代码，反推可观察的行为，生成一份人工可执行的
+  手动测试用例清单，写入 `specs/<slug>/manual-test-cases.md`。只做
+  手动调用，**不挂载**任何生命周期 hook——不会在 `speckit-implement`
+  执行过程中自动触发，需要 implement 完成后自己调用。**忽略任何输入
+  参数**，不提供按 feature 名手动指定的方式，恒定读取
+  `.specify/feature.json`（经核心 `check-prerequisites.sh` 解析）
+  确定的当前 feature。定位和 `speckit-checklist`（校验需求写得好
+  不好）互补：这个命令校验的是"实现是否符合预期"，依据是已完成的
+  代码而不是 spec 的验收场景直转。
+- 要求 `tasks.md` 里的任务**全部**标记为 `[X]` 才会生成——只要还有一条
+  `[ ]` 未完成任务，就判定 implement 尚未完成，整体硬阻断，不做部分/
+  增量生成。涉及的文件统一改用 `tasks.md` 里各任务列出的精确文件路径
+  作为唯一权威来源，不依赖 `git diff`（目标项目不一定是 git 仓库）；
+  feature 目录定位复用核心的
+  `check-prerequisites.sh --json --require-tasks`，和
+  `speckit-implement` 走同一套定位逻辑，未新增任何脚本。
+
 ## [0.5.0] - 2026-08-24
 
 ### 变更

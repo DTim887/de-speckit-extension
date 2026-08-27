@@ -12,6 +12,7 @@ DE 的组织级 Spec Kit 扩展。它的存在是为了让 DE 特有的约定和
 |------|------|
 | `speckit.de-speckit-extension.read-jira-ticket` | 读取一个 JIRA ticket（`SHDRP-<number>`）的 description，交给下一步作为输入；可挂载在 spec-kit 任意 `before_*`/`after_*` 生命周期事件上 |
 | `speckit.de-speckit-extension.figma-implement-design` | 通过 Figma MCP 服务器，把 Figma 设计稿转换成与设计 1:1 还原的可用代码 |
+| `speckit.de-speckit-extension.generate-manual-tests` | 分析当前 feature 已完成的实现代码，生成一份可供人工执行的手动测试用例清单，落地到 `specs/<slug>/manual-test-cases.md`；只做手动调用、不挂载生命周期 hook，且忽略任何输入参数，恒定只处理 `.specify/feature.json` 记录的当前 feature |
 
 ## Hooks
 

@@ -24,6 +24,10 @@ provides:
       file: commands/speckit.de-speckit-extension.figma-implement-design.md
       description: "通过 Figma MCP 服务器，把 Figma 设计稿转换成与设计 1:1 还原的可用代码"
 
+    - name: speckit.de-speckit-extension.generate-manual-tests
+      file: commands/speckit.de-speckit-extension.generate-manual-tests.md
+      description: "分析当前 feature 已完成的实现代码，生成一份可供人工执行的手动测试用例清单，落地到 specs/<slug>/manual-test-cases.md；忽略任何输入参数，恒定只处理 .specify/feature.json 记录的当前 feature"
+
   config:
     - name: "de-speckit-extension-config.yml"
       template: "config-template.yml"
