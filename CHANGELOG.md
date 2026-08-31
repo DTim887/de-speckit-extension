@@ -2,6 +2,14 @@
 
 本项目所有值得关注的变更都会记录在这个文件里。
 
+## [未发布]
+
+### 变更
+
+- `before_specify` 这个 hook 从 `optional: true` 改成 `optional: false`
+  ——`/speckit-specify` 生成前的 JIRA 门禁检查不再需要用户每次同意，
+  强制执行。其余 17 个生命周期事件维持 `optional: true` 不变。
+
 ## [0.7.3] - 2026-08-31
 
 ### 变更

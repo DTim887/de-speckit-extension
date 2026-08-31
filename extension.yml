@@ -59,7 +59,7 @@ hooks:
     description: "JIRA 门禁：读取 ticket 并交给下一步"
   before_specify:
     command: speckit.de-speckit-extension.read-jira-ticket
-    optional: true
+    optional: false
     prompt: "读取 JIRA 门禁检查 specify 生成前"
     description: "JIRA 门禁：读取 ticket 并交给下一步"
   after_specify:
