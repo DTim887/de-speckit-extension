@@ -11,6 +11,12 @@ scripts:
 调用，也可以挂载在 spec-kit 任意 `before_*`/`after_*` 生命周期事件上，
 作为该事件的 JIRA 门禁使用。
 
+**需求质量门禁（不可配置、一旦上面的 JIRA 门禁生效就强制生效）**：ticket
+的 description 里必须带有 `[SPECKIT:CLARIFIED]` 标记（说明已经跑过
+`speckit.de-speckit-extension.requirement-self-check` 做过需求质量自检），
+且不能再带有 `[SPECKIT:PENDING-REVIEW]` 标记（说明自检结果还没经 PM
+review 确认）——两个条件任一不满足都会硬阻断。详见"优雅降级"一节。
+
 ## 用户输入
 
 $ARGUMENTS
@@ -78,3 +84,7 @@ jira_gate:
     为空等）：没有优雅降级，一律硬阻断——这条不会跟上面
     `enabled: false` 的情况同时发生，因为 `enabled: false` 时压根不会
     走到这一步。
+  - 拉取成功、description 也不为空，但缺 `[SPECKIT:CLARIFIED]` 标记，
+    或者还留着 `[SPECKIT:PENDING-REVIEW]` 标记：同样没有优雅降级，
+    一律硬阻断。这条检查**不受任何配置开关控制**——只要走到了这一步
+    （即 `jira_gate.<event>.enabled` 为 `true`），就一定会做这个校验。

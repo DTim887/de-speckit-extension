@@ -3,6 +3,17 @@
 # (paragraph breaks preserved, no Markdown formatting, tables/lists not
 # specially rendered — just flattened block by block).
 #
+# Requirement-quality gate (unconditional once the JIRA gate itself is
+# enabled for the event): a ticket whose description still carries a
+# [SPECKIT:PENDING-REVIEW] marker, or that has never carried a
+# [SPECKIT:CLARIFIED] marker at all, is hard-blocked — regardless of mode.
+# Both markers are written by
+# speckit.de-speckit-extension.requirement-self-check /
+# write-jira-ticket.sh. See that command for how a ticket earns
+# [SPECKIT:CLARIFIED] and how [SPECKIT:PENDING-REVIEW] gets cleared (a human
+# PM reviews the appended clarification, deletes the original description,
+# and deletes that marker line).
+#
 # Usage:
 #   read-jira-ticket.sh <TICKET-KEY>                 # manual mode
 #   read-jira-ticket.sh <event_name> [<TICKET-KEY>]  # hook mode
@@ -228,6 +239,21 @@ plain_text="$(printf '%s' "$description_json" | jq -r "$ADF_TO_TEXT_FILTER")"
 
 if [[ -z "${plain_text// /}" ]]; then
   err "Ticket '$TICKET_KEY' has an empty description."
+  exit 1
+fi
+
+# Requirement-quality gate: this ticket must have been through
+# requirement-self-check ([SPECKIT:CLARIFIED]) and that clarification must
+# have been PM-reviewed (i.e. no leftover [SPECKIT:PENDING-REVIEW]) before
+# its description is allowed to feed *any* spec-kit lifecycle event. This
+# check runs identically in manual mode and hook mode — it is not gated by
+# jira_gate.<event>.enabled beyond the enablement check already performed
+# above; once enabled, this is unconditional and not configurable.
+if grep -qF '[SPECKIT:PENDING-REVIEW]' <<<"$plain_text"; then
+  err "Ticket '$TICKET_KEY' 的需求澄清结果还未经 PM review 确认（仍留有 [SPECKIT:PENDING-REVIEW] 标记）。请先完成 review、删除原始描述与该标记后再继续。"
+  exit 1
+elif ! grep -qF '[SPECKIT:CLARIFIED]' <<<"$plain_text"; then
+  err "Ticket '$TICKET_KEY' 尚未完成需求质量自检。请先运行 /speckit.de-speckit-extension.requirement-self-check $TICKET_KEY。"
   exit 1
 fi
 

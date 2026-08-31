@@ -2,6 +2,30 @@
 
 本项目所有值得关注的变更都会记录在这个文件里。
 
+## [未发布]
+
+### 新增
+
+- 新增 `speckit.de-speckit-extension.requirement-self-check`：对一个
+  JIRA ticket 做需求质量自检。读取现有 description，以 5W2H
+  （Who/What/Why/Where/When/How/How much）作为内部判断依据，用封闭式
+  选择题（每轮最多 3 个选项）一轮一轮追问，直到 AI 判断信息足够写
+  spec、或用户主动结束为止；若判定涉及新 UI 开发，强制要求提供 Figma
+  设计稿链接，且这一条不接受用户中途喊停跳过。整理后的需求以**追加**
+  （而非覆盖）方式写回 ticket description，保留原文，打上
+  `[SPECKIT:CLARIFIED]`（永久）和 `[SPECKIT:PENDING-REVIEW]`（待 PM
+  review 通过后手动删除）两个标记。只做手动调用，不挂载任何生命周期
+  hook。
+- 新增 `write-jira-ticket.sh`：`requirement-self-check` 的写回脚本。
+  在 ADF JSON 层面往原有 `content` 数组追加新节点，不把原文拍平重建，
+  避免破坏已有格式；支持 `--incomplete`（用户喊停时插入简短免责声明）
+  和 `--dry-run`（只打印待写入的 ADF payload，不真正调用 PUT）。
+- `read-jira-ticket.sh` 新增强制的需求质量校验：description 里缺少
+  `[SPECKIT:CLARIFIED]` 标记，或仍带有 `[SPECKIT:PENDING-REVIEW]`
+  标记，一律硬阻断——这条校验对手动调用和 hook 调用一视同仁，覆盖全部
+  18 个共用这个脚本的生命周期事件，且不受除
+  `jira_gate.<event>.enabled` 之外的任何配置控制。
+
 ## [0.6.0] - 2026-08-27
 
 ### 新增
