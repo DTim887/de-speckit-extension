@@ -253,7 +253,7 @@ if grep -qF '[SPECKIT:PENDING-REVIEW]' <<<"$plain_text"; then
   err "Ticket '$TICKET_KEY' 的需求澄清结果还未经 PM review 确认（仍留有 [SPECKIT:PENDING-REVIEW] 标记）。请先完成 review、删除原始描述与该标记后再继续。"
   exit 1
 elif ! grep -qF '[SPECKIT:CLARIFIED]' <<<"$plain_text"; then
-  err "Ticket '$TICKET_KEY' 尚未完成需求质量自检。请先运行 /speckit.de-speckit-extension.requirement-self-check $TICKET_KEY。"
+  err "Ticket '$TICKET_KEY' 尚未完成需求质量自检。请先运行 /speckit.de-speckit-extension.requirement-self-check ${TICKET_KEY}。"
   exit 1
 fi
 
