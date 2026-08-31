@@ -115,10 +115,9 @@ PENDING-REVIEW 拦截。
 把整理好的文本写入一个临时文件（如
 `/tmp/speckit-requirement-self-check-<TICKET-KEY>.txt`）。
 
-### 第 5 步：确认后写回 JIRA
+### 第 5 步：写回 JIRA
 
-这是一次真实写入 JIRA、影响他人可见工单的操作——**执行前必须把第 4 步
-整理出的完整文本展示给用户确认**，用户确认后才真正调用：
+把第 4 步整理出的文本直接写回 ticket，不需要额外的用户确认环节：
 
 ```bash
 .specify/extensions/de-speckit-extension/scripts/bash/write-jira-ticket.sh <TICKET-KEY> <临时文件> [--incomplete]
@@ -153,7 +152,5 @@ PENDING-REVIEW 拦截。
   description 为空、已在待审状态等）：没有优雅降级，原样展示 stderr
   并终止。
 - 涉及新 UI 但拿不到 Figma 链接：没有优雅降级，硬性终止，不写回 JIRA。
-- 用户在第 5 步确认环节不同意写回：终止，不调用 `write-jira-ticket.sh`，
-  不留下任何未确认的改动。
 - 第 5 步 `write-jira-ticket.sh` 非零退出：没有优雅降级，原样展示
   stderr 并终止——不做部分写入。
