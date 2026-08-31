@@ -2,6 +2,20 @@
 
 本项目所有值得关注的变更都会记录在这个文件里。
 
+## [0.7.2] - 2026-08-31
+
+### 修复
+
+- 修复 `requirement-self-check` 第 1 步的死锁：它读取 ticket 用的是
+  `read-jira-ticket.sh`，而这个脚本要求 ticket 必须已经带
+  `[SPECKIT:CLARIFIED]` 标记——但这个标记恰恰只有
+  `requirement-self-check` 自己才能打上，导致一张从没做过自检的 ticket
+  永远无法通过第一步，命令对它本该处理的对象反而完全用不了。给
+  `read-jira-ticket.sh` 加了一个仅供内部使用的
+  `--skip-clarified-check` 参数，只跳过"必须已有 CLARIFIED"这一条，
+  `[SPECKIT:PENDING-REVIEW]` 拦截不受影响，并接入到
+  `requirement-self-check` 第 1 步的调用里。
+
 ## [0.7.1] - 2026-08-31
 
 ### 修复
