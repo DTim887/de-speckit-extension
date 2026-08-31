@@ -53,14 +53,20 @@ $ARGUMENTS
 调用：
 
 ```bash
-.specify/extensions/de-speckit-extension/scripts/bash/read-jira-ticket.sh <TICKET-KEY>
+.specify/extensions/de-speckit-extension/scripts/bash/read-jira-ticket.sh <TICKET-KEY> --skip-clarified-check
 ```
 
-（手动模式）。非零退出：原样展示 stderr 并**终止**。这包括几种预期内的
-情形——ticket 不存在、认证/网络失败、description 为空，以及"这张 ticket
-已经跑过自检、还在待审状态"（此时脚本会报"仍留有
-`[SPECKIT:PENDING-REVIEW]` 标记"）——一律停止，不重复处理已经在审的
-ticket。
+（手动模式）。**必须带 `--skip-clarified-check`**：这张 ticket 本来就
+是要来做自检的，天然不会有 `[SPECKIT:CLARIFIED]` 标记，如果不加这个
+参数，`read-jira-ticket.sh` 的门禁会把"没有 CLARIFIED 标记"当成硬阻断
+条件，导致本命令永远无法对任何新 ticket 完成第一步（自己拦死自己）。
+这个参数只跳过"必须已有 CLARIFIED"这一条，不影响下面的
+PENDING-REVIEW 拦截。
+
+非零退出：原样展示 stderr 并**终止**。这包括几种预期内的情形——ticket
+不存在、认证/网络失败、description 为空，以及"这张 ticket 已经跑过
+自检、还在待审状态"（此时脚本会报"仍留有 `[SPECKIT:PENDING-REVIEW]`
+标记"）——一律停止，不重复处理已经在审的 ticket。
 
 ### 第 2 步：基于 5W2H 追问澄清
 
@@ -133,7 +139,7 @@ ticket。
 ## 执行
 
 - **Bash**：
-  - `.specify/extensions/de-speckit-extension/scripts/bash/read-jira-ticket.sh <TICKET-KEY>`
+  - `.specify/extensions/de-speckit-extension/scripts/bash/read-jira-ticket.sh <TICKET-KEY> --skip-clarified-check`
   - `.specify/extensions/de-speckit-extension/scripts/bash/write-jira-ticket.sh <TICKET-KEY> <临时文件> [--incomplete]`
 
 两个脚本都需要环境变量 `ATLASSIAN_EMAIL` 和 `ATLASSIAN_API_TOKEN`（这个

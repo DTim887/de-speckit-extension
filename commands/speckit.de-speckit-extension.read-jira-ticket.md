@@ -17,6 +17,12 @@ scripts:
 且不能再带有 `[SPECKIT:PENDING-REVIEW]` 标记（说明自检结果还没经 PM
 review 确认）——两个条件任一不满足都会硬阻断。详见"优雅降级"一节。
 
+唯一的例外：`speckit.de-speckit-extension.requirement-self-check` 自己
+第 1 步内部会带 `--skip-clarified-check` 参数调用本脚本，跳过"必须已有
+CLARIFIED"这一条（否则自检命令永远无法对任何新 ticket 完成第一步）；
+PENDING-REVIEW 拦截不受影响。这个参数不对外暴露、不可配置，只在
+`requirement-self-check` 内部使用。
+
 ## 用户输入
 
 $ARGUMENTS

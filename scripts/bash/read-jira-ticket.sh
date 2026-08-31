@@ -15,8 +15,16 @@
 # and deletes that marker line).
 #
 # Usage:
-#   read-jira-ticket.sh <TICKET-KEY>                 # manual mode
+#   read-jira-ticket.sh <TICKET-KEY> [--skip-clarified-check]
 #   read-jira-ticket.sh <event_name> [<TICKET-KEY>]  # hook mode
+#
+# --skip-clarified-check is an internal-only escape hatch used exclusively
+# by requirement-self-check's own step 1: a ticket that has never been
+# through self-check will never carry [SPECKIT:CLARIFIED], so without this
+# flag self-check could never read a ticket it is meant to clarify. It
+# skips only the "must already carry [SPECKIT:CLARIFIED]" branch; the
+# "must not still carry [SPECKIT:PENDING-REVIEW]" branch still applies, so
+# self-check still can't be re-run on a ticket that's already mid-review.
 #
 # Manual mode: $1 is a ticket key (e.g. SHDRP-437322). Validates, fetches,
 # prints. Any failure is a non-zero exit with a message on stderr.
@@ -48,8 +56,18 @@ err() {
   echo "[read-jira-ticket] $1" >&2
 }
 
-ARG1="${1:-}"
-ARG2="${2:-}"
+SKIP_CLARIFIED_CHECK=false
+positional=()
+for arg in "$@"; do
+  if [[ "$arg" == "--skip-clarified-check" ]]; then
+    SKIP_CLARIFIED_CHECK=true
+  else
+    positional+=("$arg")
+  fi
+done
+
+ARG1="${positional[0]:-}"
+ARG2="${positional[1]:-}"
 TICKET_KEY=""
 
 if [[ -z "$ARG1" ]]; then
@@ -252,7 +270,7 @@ fi
 if grep -qF '[SPECKIT:PENDING-REVIEW]' <<<"$plain_text"; then
   err "Ticket '$TICKET_KEY' 的需求澄清结果还未经 PM review 确认（仍留有 [SPECKIT:PENDING-REVIEW] 标记）。请先完成 review、删除原始描述与该标记后再继续。"
   exit 1
-elif ! grep -qF '[SPECKIT:CLARIFIED]' <<<"$plain_text"; then
+elif ! $SKIP_CLARIFIED_CHECK && ! grep -qF '[SPECKIT:CLARIFIED]' <<<"$plain_text"; then
   err "Ticket '$TICKET_KEY' 尚未完成需求质量自检。请先运行 /speckit.de-speckit-extension.requirement-self-check ${TICKET_KEY}。"
   exit 1
 fi
