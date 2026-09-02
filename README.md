@@ -98,7 +98,7 @@ Spec Kit catalog 上架）：
 
 ```bash
 specify extension add de-speckit-extension \
-  --from https://github.com/DTim887/de-speckit-extension/archive/refs/tags/v0.7.4.zip
+  --from https://github.com/DTim887/de-speckit-extension/archive/refs/tags/v0.8.0.zip
 ```
 
 针对本仓库的本地检出做本地开发：
