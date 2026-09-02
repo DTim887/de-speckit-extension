@@ -2,6 +2,34 @@
 
 本项目所有值得关注的变更都会记录在这个文件里。
 
+## [未发布]
+
+### 新增
+
+- 新增 `speckit.de-speckit-extension.playwright-test`：对当前 feature
+  已完成的实现，调用 [Playwright Test Agents](https://playwright.dev/docs/test-agents)
+  的 Planner/Generator 两个 sub agent，自动生成测试计划、转成可执行的
+  Playwright 测试代码，再实际跑一遍产出测试报告。要求本机已通过
+  `npx playwright init-agents --loop=claude` 装好 Playwright Test
+  Agents（`.claude/agents/planner.md` / `generator.md`），且
+  `npx playwright` 能正常运行，否则终止报错、不代为安装。只做手动
+  调用，不挂载生命周期 hook，忽略任何输入参数，恒定只处理
+  `.specify/feature.json` 记录的当前 feature，且要求 `tasks.md` 全部
+  任务已完成才会执行。
+- 从 `spec.md`/`plan.md`/项目 `constitution.md`/`tasks.md` 提炼测试
+  相关上下文（验收场景、技术栈与关键组件、测试相关规范、已完成任务涉及
+  的精确文件路径）喂给 Planner，文件定位复用 `generate-manual-tests`
+  已有的做法（以 `tasks.md` 列出的文件路径为唯一权威来源，不依赖
+  `git diff`）。
+- 测试计划、测试代码、测试报告统一按当前 feature 隔离存放
+  （`specs/<slug>/playwright/test-plan.md`、`tests/<slug>/`、
+  `specs/<slug>/playwright/report/`），不用 Playwright 官方默认的项目
+  根级路径，避免多个 feature 之间、以及和 spec-kit 自己的
+  `specs/<slug>/` 互相覆盖或混淆。执行范围只限当前 feature 生成的
+  测试，不会带上项目里已有的其他 Playwright 测试。测试执行本身有用例
+  失败不算命令失败，正常展示报告；只有 Planner/Generator 执行异常、
+  或报告本身都没能生成时才会硬阻断终止。
+
 ## [0.7.4] - 2026-08-31
 
 ### 变更

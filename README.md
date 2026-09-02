@@ -14,6 +14,7 @@ DE 的组织级 Spec Kit 扩展。它的存在是为了让 DE 特有的约定和
 | `speckit.de-speckit-extension.figma-implement-design` | 通过 Figma MCP 服务器，把 Figma 设计稿转换成与设计 1:1 还原的可用代码 |
 | `speckit.de-speckit-extension.generate-manual-tests` | 分析当前 feature 已完成的实现代码，生成一份可供人工执行的手动测试用例清单，落地到 `specs/<slug>/manual-test-cases.md`；只做手动调用、不挂载生命周期 hook，且忽略任何输入参数，恒定只处理 `.specify/feature.json` 记录的当前 feature |
 | `speckit.de-speckit-extension.requirement-self-check` | 对一个 JIRA ticket（`SHDRP-<number>`）做需求质量自检：基于 5W2H 标准用封闭式选择题一轮一轮追问，直到信息足够或用户主动结束，再把澄清结果追加写回 ticket description；只做手动调用、不挂载生命周期 hook |
+| `speckit.de-speckit-extension.playwright-test` | 对当前 feature 已完成的实现，调用 Playwright Test Agents 的 Planner/Generator 自动生成并执行端到端测试，输出测试计划、测试代码与测试报告的路径；只做手动调用、不挂载生命周期 hook，要求本机已安装 Playwright Test Agents 且 implement 全部任务已完成 |
 
 ## Hooks
 
@@ -60,6 +61,28 @@ analyze、taskstoissues）。每个事件都是 `optional: true`（默认，见
 若判定需求涉及新 UI 开发，`requirement-self-check` 还会强制要求提供
 一个 Figma 设计稿链接——这一条不接受用户中途喊停跳过，缺链接时自检
 流程本身就会终止，不会写回 JIRA。
+
+## Playwright 自动化测试
+
+`speckit.de-speckit-extension.playwright-test` 依赖本机已经装好
+[Playwright Test Agents](https://playwright.dev/docs/test-agents)
+（`npx playwright init-agents --loop=claude`，会生成
+`.claude/agents/planner.md` / `generator.md`）——没装就终止报错，本命令
+不负责代为安装。
+
+执行时会先确认 implement 全部任务已完成，再从 `spec.md`/`plan.md`/项目
+`constitution.md`/`tasks.md` 提炼上下文，依次调用 Planner、Generator，
+最后实际执行一次 `npx playwright test`。产出统一按当前 feature 隔离
+存放，不用 Playwright 官方默认的项目根级路径：
+
+- 测试计划：`specs/<feature-slug>/playwright/test-plan.md`
+- 测试代码：`tests/<feature-slug>/`
+- 测试报告：`specs/<feature-slug>/playwright/report/`
+
+只跑当前 feature 生成的测试，不会把项目里已有的其他 Playwright 测试
+一起跑一遍。测试执行本身有用例失败不算命令失败，会正常展示报告；只有
+Planner/Generator 执行异常，或 Playwright 报告本身都没能生成时，才会
+硬阻断终止。完整行为见命令文件里的"优雅降级"一节。
 
 ## 配置
 
