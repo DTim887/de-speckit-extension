@@ -2,6 +2,17 @@
 
 本项目所有值得关注的变更都会记录在这个文件里。
 
+## [0.8.1] - 2026-09-02
+
+### 修复
+
+- 修复 `playwright-test` 里 Playwright Test Agents 的文件名：
+  `npx playwright init-agents --loop=claude` 实际生成的是
+  `.claude/agents/playwright-test-planner.md` 和
+  `.claude/agents/playwright-test-generator.md`，不是此前假设的
+  `planner.md`/`generator.md`。修正了存在性检查，以及分派 Planner/
+  Generator 时使用的 agent 名称。
+
 ## [0.8.0] - 2026-09-02
 
 ### 新增
