@@ -67,7 +67,7 @@ analyze、taskstoissues）。每个事件都是 `optional: true`（默认，见
 `speckit.de-speckit-extension.playwright-test` 依赖本机已经装好
 [Playwright Test Agents](https://playwright.dev/docs/test-agents)
 （`npx playwright init-agents --loop=claude`，会生成
-`.claude/agents/planner.md` / `generator.md`）——没装就终止报错，本命令
+`.claude/agents/playwright-test-planner.md` / `playwright-test-generator.md`）——没装就终止报错，本命令
 不负责代为安装。
 
 执行时会先确认 implement 全部任务已完成，再从 `spec.md`/`plan.md`/项目

@@ -7,8 +7,8 @@ description: "对当前 feature（.specify/feature.json 记录的那一个）已
 对当前已完成实现的 feature，调用 [Playwright Test Agents](https://playwright.dev/docs/test-agents)
 的 Planner 和 Generator 两个 sub agent，自动生成一份测试计划、把它转成可执行的
 Playwright 测试代码，再实际跑一遍，产出测试报告。定位是"针对这个 feature
-自动跑一轮端到端测试"，依赖本机已经装好 Playwright Test Agents（`.claude/agents/planner.md`
-/ `generator.md`），本命令不负责安装它们，也不调用 Healer 做自动修复。
+自动跑一轮端到端测试"，依赖本机已经装好 Playwright Test Agents（`.claude/agents/playwright-test-planner.md`
+/ `playwright-test-generator.md`），本命令不负责安装它们，也不调用 Healer 做自动修复。
 
 ## 用户输入
 
@@ -68,10 +68,10 @@ feature（见下方"第 1 步"）。不支持通过参数指定其他 feature；
 
 依次检查，任一条件不满足都**立即终止**，不进入后续步骤：
 
-- `.claude/agents/planner.md` 是否存在（相对项目根目录）。不存在：报错
+- `.claude/agents/playwright-test-planner.md` 是否存在（相对项目根目录）。不存在：报错
   "未检测到 Playwright Test Agents 的 planner，请先运行
   `npx playwright init-agents --loop=claude` 完成安装"，终止。
-- `.claude/agents/generator.md` 是否存在。不存在：报错提示同上，终止。
+- `.claude/agents/playwright-test-generator.md` 是否存在。不存在：报错提示同上，终止。
 - 运行 `npx playwright --version`。非零退出：报错"`npx playwright`
   无法运行，请检查 Playwright 是否已正确安装"，终止。
 
@@ -99,8 +99,8 @@ feature（见下方"第 1 步"）。不支持通过参数指定其他 feature；
 
 ### 第 4 步：调用 Planner，生成测试计划
 
-用 Task/Agent 工具，以 `.claude/agents/planner.md` 里定义的 agent 名称
-（通常是 `planner`）作为 subagent 分派任务，输入是第 3 步提炼出的上下文，
+用 Task/Agent 工具，以 `.claude/agents/playwright-test-planner.md` 里定义的 agent 名称
+（通常是 `playwright-test-planner`）作为 subagent 分派任务，输入是第 3 步提炼出的上下文，
 并**明确指示**：把生成的测试计划写到
 
 ```
@@ -115,8 +115,8 @@ Planner 执行异常/失败：原样展示错误信息，**终止**，不调用 
 ### 第 5 步：调用 Generator，生成测试代码
 
 Planner 成功产出 `<FEATURE_DIR>/playwright/test-plan.md` 后，自动用 Task/
-Agent 工具以 `.claude/agents/generator.md` 里定义的 agent 名称（通常是
-`generator`）分派任务，输入是第 4 步产出的测试计划文件，并**明确指示**：
+Agent 工具以 `.claude/agents/playwright-test-generator.md` 里定义的 agent 名称（通常是
+`playwright-test-generator`）分派任务，输入是第 4 步产出的测试计划文件，并**明确指示**：
 把生成的测试代码写到
 
 ```
@@ -162,14 +162,14 @@ PLAYWRIGHT_HTML_REPORT="<FEATURE_DIR>/playwright/report" \
   - `npx playwright --version`
   - `PLAYWRIGHT_HTML_REPORT="<FEATURE_DIR>/playwright/report" npx playwright test "tests/<FEATURE_SLUG>/" --reporter=html --output="<FEATURE_DIR>/playwright/report/artifacts"`
 - **Agent/Task 调用**：
-  - Planner（agent 名称取自 `.claude/agents/planner.md`）
-  - Generator（agent 名称取自 `.claude/agents/generator.md`）
+  - Planner（agent 名称取自 `.claude/agents/playwright-test-planner.md`）
+  - Generator（agent 名称取自 `.claude/agents/playwright-test-generator.md`）
 
 ## 优雅降级
 
 - `tasks.md` 里存在任意 `[ ]` 未完成任务：停止，提示先跑完
   `speckit-implement` 的全部任务——这是硬阻断，没有优雅降级。
-- `.claude/agents/planner.md` 或 `.claude/agents/generator.md` 缺失、或
+- `.claude/agents/playwright-test-planner.md` 或 `.claude/agents/playwright-test-generator.md` 缺失、或
   `npx playwright` 跑不起来：停止，提示用户先完成 Playwright Test Agents
   的安装/环境配置——没有优雅降级，本命令不代为安装。
 - `spec.md`/`plan.md`/项目 `constitution.md` 不存在：不阻断——第 3 步跳过

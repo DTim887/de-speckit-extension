@@ -11,7 +11,7 @@
   的 Planner/Generator 两个 sub agent，自动生成测试计划、转成可执行的
   Playwright 测试代码，再实际跑一遍产出测试报告。要求本机已通过
   `npx playwright init-agents --loop=claude` 装好 Playwright Test
-  Agents（`.claude/agents/planner.md` / `generator.md`），且
+  Agents（`.claude/agents/playwright-test-planner.md` / `playwright-test-generator.md`），且
   `npx playwright` 能正常运行，否则终止报错、不代为安装。只做手动
   调用，不挂载生命周期 hook，忽略任何输入参数，恒定只处理
   `.specify/feature.json` 记录的当前 feature，且要求 `tasks.md` 全部
